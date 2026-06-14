@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeqel Retracted Glass Generador 2026</title>
+    <title>Retracted Glass Generador - Zeqel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -30,7 +30,12 @@
         </div>
         
         <div class="flex flex-col gap-1.5">
-            <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Refracción (Grosor)</label>
+            <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Grosor de Líneas</label>
+            <input type="range" id="thickness" min="0.2" max="5.0" step="0.1" value="1.0" class="w-full accent-white h-1 bg-white/30 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Intensidad (Refracción)</label>
             <input type="range" id="intensity" min="0" max="3" step="0.1" value="1.5" class="w-full accent-white h-1 bg-white/30 rounded-lg appearance-none cursor-pointer">
         </div>
 
@@ -140,6 +145,7 @@
         uniform vec3 u_color2; // Tinte de sombra
         uniform float u_fitMode; // 0.0 para cubrir, 1.0 para contener
         uniform float u_angle; // NUEVO: Ángulo del cristal en grados
+        uniform float u_ribsCount; // NUEVO: Cantidad de líneas / Grosor
         
         // Variables para la textura
         uniform sampler2D u_image;
@@ -169,7 +175,7 @@
             vec2 uv = gl_FragCoord.xy / resolution.xy;
             
             // Cantidad de columnas de cristal
-            float ribsCount = 45.0; 
+            float ribsCount = u_ribsCount; 
             
             // NUEVO: Calculamos la dirección del vector basada en el ángulo
             float rad = radians(u_angle);
@@ -276,6 +282,7 @@
         const color2Loc = gl.getUniformLocation(program, 'u_color2');
         const fitModeLoc = gl.getUniformLocation(program, 'u_fitMode');
         const angleLoc = gl.getUniformLocation(program, 'u_angle'); // Nuevo Uniforme de Ángulo
+        const ribsCountLoc = gl.getUniformLocation(program, 'u_ribsCount'); // Nuevo Uniforme de Grosor
         
         const imageResLoc = gl.getUniformLocation(program, 'u_imageRes');
         const imageLoadedLoc = gl.getUniformLocation(program, 'u_imageLoaded');
@@ -378,6 +385,7 @@
 
         // Elementos de la UI
         const speedCtrl = document.getElementById('speed');
+        const thicknessCtrl = document.getElementById('thickness');
         const intensityCtrl = document.getElementById('intensity');
         const color1Ctrl = document.getElementById('color1');
         const color2Ctrl = document.getElementById('color2');
@@ -462,6 +470,7 @@
             gl.uniform1f(speedLoc, parseFloat(speedCtrl.value));
             gl.uniform1f(intensityLoc, parseFloat(intensityCtrl.value));
             gl.uniform1f(fitModeLoc, parseFloat(fitSelect.value)); 
+            gl.uniform1f(ribsCountLoc, 45.0 / parseFloat(thicknessCtrl.value));
             
             // Lógica de Ángulo (Suma Orientación + Inclinación Manual)
             let baseAngle = parseFloat(directionSelect.value);
@@ -479,6 +488,30 @@
         }
 
         window.onload = () => requestAnimationFrame(render);
+
+        // --- Bloqueo de herramientas de desarrollo ---
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); // Bloquea el clic derecho
+        });
+
+        document.addEventListener('keydown', function(e) {
+            // Bloquea F12
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+            }
+            // Bloquea Ctrl+Shift+I (Inspeccionar)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+                e.preventDefault();
+            }
+            // Bloquea Ctrl+Shift+J (Consola)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+                e.preventDefault();
+            }
+            // Bloquea Ctrl+U (Ver código fuente)
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
