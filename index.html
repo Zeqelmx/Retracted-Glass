@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEQEL RETRACTED GLASS GENERADOR 2026</title>
+    <title>Shader Glass Vertical Refraction</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -11,27 +11,48 @@
         /* Centrado preciso para los inputs de color */
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
+        /* Ocultar barra de desplazamiento en el contenedor si crece mucho */
+        #mainController { max-height: 95vh; overflow-y: auto; scrollbar-width: none; }
+        #mainController::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
     <!-- Controlador Vertical Izquierdo -->
-    <div id="mainController" class="absolute left-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-stretch gap-6 p-6 w-72 bg-black/40 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl ui-element transition-opacity duration-300">
+    <div id="mainController" class="absolute left-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-stretch gap-4 p-6 w-72 bg-black/40 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl ui-element transition-opacity duration-300">
         
         <!-- Logotipo Zeqel Integrado -->
-        <img id="mainLogo" src="https://raw.githubusercontent.com/eamxat/Imagenes-Zeqel/e78e9ea4a7f4681aebbd9e34c02e3079c4369129/Zeqel%20Texto%20negro.svg" alt="Zeqel Logo" class="h-8 invert drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] self-center mb-2">
+        <img id="mainLogo" src="https://raw.githubusercontent.com/eamxat/Imagenes-Zeqel/e78e9ea4a7f4681aebbd9e34c02e3079c4369129/Zeqel%20Texto%20negro.svg" alt="Zeqel Logo" class="h-8 invert drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] self-center mb-1">
 
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1.5">
             <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Movimiento</label>
             <input type="range" id="speed" min="0.0" max="2" step="0.05" value="0.2" class="w-full accent-white h-1 bg-white/30 rounded-lg appearance-none cursor-pointer">
         </div>
         
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1.5">
             <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Refracción (Grosor)</label>
             <input type="range" id="intensity" min="0" max="3" step="0.1" value="1.5" class="w-full accent-white h-1 bg-white/30 rounded-lg appearance-none cursor-pointer">
         </div>
+
+        <!-- NUEVO: Selector de Orientación -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Orientación</label>
+            <select id="directionSelect" class="w-full bg-white/20 text-white text-[11px] rounded px-2 py-1.5 outline-none cursor-pointer border border-white/30">
+                <option value="0" class="text-black">Vertical</option>
+                <option value="90" class="text-black">Horizontal</option>
+            </select>
+        </div>
+
+        <!-- NUEVO: Slider de Inclinación en Grados -->
+        <div class="flex flex-col gap-1.5">
+            <div class="flex justify-between items-center">
+                <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Inclinación</label>
+                <span id="angleValueDisplay" class="text-white/90 text-[11px] font-bold drop-shadow-md">0°</span>
+            </div>
+            <input type="range" id="angle" min="-90" max="90" step="1" value="0" class="w-full accent-white h-1 bg-white/30 rounded-lg appearance-none cursor-pointer">
+        </div>
         
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between mt-1">
             <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Tinte Luz</label>
             <input type="color" id="color1" value="#ffffff" class="w-7 h-5 rounded cursor-pointer border-0 p-0 bg-transparent">
         </div>
@@ -41,9 +62,9 @@
             <input type="color" id="color2" value="#000000" class="w-7 h-5 rounded cursor-pointer border-0 p-0 bg-transparent">
         </div>
 
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1.5 mt-1">
             <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Imagen</label>
-            <select id="imageSelect" class="w-full bg-white/20 text-white text-[11px] rounded px-2 py-2 outline-none cursor-pointer border border-white/30">
+            <select id="imageSelect" class="w-full bg-white/20 text-white text-[11px] rounded px-2 py-1.5 outline-none cursor-pointer border border-white/30">
                 <option value="0" class="text-black">Retrato Floral</option>
                 <option value="1" class="text-black">Ciudad Neón</option>
                 <option value="2" class="text-black">Naturaleza</option>
@@ -53,10 +74,19 @@
             </select>
         </div>
 
+        <!-- Selector de Ajuste en Pantalla -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Ajuste en Pantalla</label>
+            <select id="fitSelect" class="w-full bg-white/20 text-white text-[11px] rounded px-2 py-1.5 outline-none cursor-pointer border border-white/30">
+                <option value="0" class="text-black">Cubrir Pantalla</option>
+                <option value="1" class="text-black">Tamaño Original (Contener)</option>
+            </select>
+        </div>
+
         <!-- Selector de Calidad de Captura -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1.5">
             <label class="text-white/90 text-[11px] font-bold uppercase tracking-widest drop-shadow-md">Calidad de Captura</label>
-            <select id="captureResSelect" class="w-full bg-white/20 text-white text-[11px] rounded px-2 py-2 outline-none cursor-pointer border border-white/30">
+            <select id="captureResSelect" class="w-full bg-white/20 text-white text-[11px] rounded px-2 py-1.5 outline-none cursor-pointer border border-white/30">
                 <option value="screen" class="text-black">Pantalla Actual</option>
                 <option value="hd720" class="text-black">HD (1280x720)</option>
                 <option value="hd" class="text-black">FHD (1920x1080)</option>
@@ -108,17 +138,28 @@
         uniform float u_intensity;
         uniform vec3 u_color1; // Tinte de luz
         uniform vec3 u_color2; // Tinte de sombra
+        uniform float u_fitMode; // 0.0 para cubrir, 1.0 para contener
+        uniform float u_angle; // NUEVO: Ángulo del cristal en grados
         
         // Variables para la textura
         uniform sampler2D u_image;
         uniform vec2 u_imageRes;
         uniform bool u_imageLoaded;
 
-        // Función para simular el comportamiento de "background-size: cover" (cubrir toda la pantalla)
+        // Función para simular el comportamiento de "background-size: cover"
         vec2 getCoverUv(vec2 uv, vec2 res, vec2 imgRes) {
             vec2 ratio = res / imgRes;
-            float maxRatio = max(ratio.x, ratio.y); // Usamos max para que siempre cubra todo
+            float maxRatio = max(ratio.x, ratio.y);
             vec2 scaledImgRes = imgRes * maxRatio;
+            vec2 offset = (scaledImgRes - res) / 2.0;
+            return (uv * res + offset) / scaledImgRes;
+        }
+
+        // Función para simular el comportamiento de "background-size: contain"
+        vec2 getContainUv(vec2 uv, vec2 res, vec2 imgRes) {
+            vec2 ratio = res / imgRes;
+            float minRatio = min(ratio.x, ratio.y);
+            vec2 scaledImgRes = imgRes * minRatio;
             vec2 offset = (scaledImgRes - res) / 2.0;
             return (uv * res + offset) / scaledImgRes;
         }
@@ -127,55 +168,63 @@
             // UV normalizado de 0.0 a 1.0
             vec2 uv = gl_FragCoord.xy / resolution.xy;
             
-            // Cantidad de columnas de cristal (estilo ribbed glass de tu referencia)
+            // Cantidad de columnas de cristal
             float ribsCount = 45.0; 
             
-            // Animamos horizontalmente el "cristal" deslizando sobre la imagen
-            float panX = uv.x + (time * u_speed * 0.1);
+            // NUEVO: Calculamos la dirección del vector basada en el ángulo
+            float rad = radians(u_angle);
+            vec2 dir = vec2(cos(rad), sin(rad));
+            
+            // Animamos proyectando el UV sobre nuestro vector de dirección
+            float pan = dot(uv, dir) + (time * u_speed * 0.1);
             
             // Posición local dentro de la estría de cristal actual (0.0 a 1.0)
-            // AQUÍ ESTÁ LA MAGIA: Solo alteramos el eje X para crear LÍNEAS VERTICALES
-            float ribPos = fract(panX * ribsCount);
+            float ribPos = fract(pan * ribsCount);
             
             // Convertimos la posición a un rango de -1.0 a 1.0 para simular la curva de un cilindro
             float xCurve = ribPos * 2.0 - 1.0;
             
-            // Calculamos la pendiente/curvatura del cristal (usando seno para suavidad)
+            // Calculamos la pendiente/curvatura del cristal
             float slope = sin(xCurve * 1.5707); // 1.5707 = PI/2
             
-            // Refracción: Desplazamos las coordenadas X de la textura
-            // Esto "aplasta" visualmente la imagen simulando el lente de cristal cilíndrico
+            // Refracción: Desplazamos las coordenadas guiadas por el vector de dirección
             vec2 refractedUv = uv;
-            refractedUv.x -= slope * 0.015 * u_intensity;
+            refractedUv -= dir * slope * 0.015 * u_intensity;
             
             vec4 finalColor = vec4(0.0);
             
             if (u_imageLoaded) {
-                // Obtenemos el UV ajustado para que la imagen cubra toda la pantalla
-                vec2 coverUv = getCoverUv(refractedUv, resolution, u_imageRes);
+                vec4 texColor = vec4(0.0, 0.0, 0.0, 1.0); // Fondo negro
                 
-                // Leemos el color directamente (ya no necesitamos comprobar los bordes negros)
-                vec4 texColor = texture2D(u_image, coverUv);
+                if (u_fitMode > 0.5) {
+                    // Modo "Tamaño Original" (Contener)
+                    vec2 containUv = getContainUv(refractedUv, resolution, u_imageRes);
+                    if (containUv.x >= 0.0 && containUv.x <= 1.0 && containUv.y >= 0.0 && containUv.y <= 1.0) {
+                        texColor = texture2D(u_image, containUv);
+                    }
+                } else {
+                    // Modo "Cubrir Pantalla"
+                    vec2 coverUv = getCoverUv(refractedUv, resolution, u_imageRes);
+                    texColor = texture2D(u_image, coverUv);
+                }
                 
-                // Efectos 3D de Luz y Sombra para darle volumen a cada línea vertical
-                // La luz pega más fuerte en un lado de la curva
+                // Efectos 3D de Luz y Sombra para darle volumen a cada línea
                 float highlight = pow(smoothstep(0.0, 0.4, -xCurve), 3.0) * 0.35 * u_intensity;
                 float shadow = smoothstep(0.5, 1.0, xCurve) * 0.2 * u_intensity;
                 
                 // Color base
                 vec3 rgb = texColor.rgb;
                 
-                // Aplicamos un ligero tinte cinematográfico en gradiente usando tus colores
+                // Aplicamos un ligero tinte cinematográfico (dependiendo del eje Y general)
                 vec3 tint = mix(u_color1, u_color2, uv.y);
-                rgb = mix(rgb, tint, 0.15); // Mezcla un 15% del tinte
+                rgb = mix(rgb, tint, 0.15); 
                 
-                // Sumamos brillos (usando Color 1) y restamos sombras
+                // Sumamos brillos y restamos sombras
                 rgb += highlight * u_color1;
-                rgb -= shadow * (1.0 - u_color2); // Oscurecer
+                rgb -= shadow * (1.0 - u_color2); 
                 
                 finalColor = vec4(rgb, 1.0);
             } else {
-                // Color de carga si la imagen tarda
                 finalColor = vec4(0.1, 0.1, 0.1, 1.0);
             }
 
@@ -185,7 +234,6 @@
 
     <script>
         const canvas = document.getElementById('glCanvas');
-        // Usamos preserveDrawingBuffer para garantizar que WebGL nos permita hacer la captura
         const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
 
         function createShader(gl, type, source) {
@@ -213,7 +261,6 @@
 
         const positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        // Cubrimos toda la pantalla
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
 
         const posAttrib = gl.getAttribLocation(program, 'position');
@@ -227,30 +274,28 @@
         const intensityLoc = gl.getUniformLocation(program, 'u_intensity');
         const color1Loc = gl.getUniformLocation(program, 'u_color1');
         const color2Loc = gl.getUniformLocation(program, 'u_color2');
+        const fitModeLoc = gl.getUniformLocation(program, 'u_fitMode');
+        const angleLoc = gl.getUniformLocation(program, 'u_angle'); // Nuevo Uniforme de Ángulo
         
         const imageResLoc = gl.getUniformLocation(program, 'u_imageRes');
         const imageLoadedLoc = gl.getUniformLocation(program, 'u_imageLoaded');
 
-        // Galería de imágenes (Unsplash permite CORS)
+        // Galería de imágenes
         const imageList = [
-            'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=2574&auto=format&fit=crop', // Retrato
-            'https://images.unsplash.com/photo-1555448248-2571daf6344b?q=80&w=2000&auto=format&fit=crop', // Ciudad Neón
-            'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop', // Naturaleza
-            'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop'  // Abstracto
+            'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=2574&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1555448248-2571daf6344b?q=80&w=2000&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop' 
         ];
 
-        // Guardamos las dimensiones originales de la imagen activa
         let currentImgW = 1920;
         let currentImgH = 1080;
 
-        // Preparar textura fotográfica
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        // Indicamos a WebGL que voltee las coordenadas Y al cargar texturas
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
 
-        // Función para cargar dinámicamente la textura desde una URL
         function loadTextureFromUrl(url) {
             const img = new Image();
             img.crossOrigin = "anonymous";
@@ -260,12 +305,10 @@
                 currentImgH = img.height;
                 
                 gl.bindTexture(gl.TEXTURE_2D, texture);
-                // Aseguramos que la imagen se cargue en su orientación correcta
                 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                // Aseguramos alta calidad tanto para minimizar como para magnificar la textura
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 
@@ -278,10 +321,8 @@
             };
         }
         
-        // Carga inicial (Retrato)
         loadTextureFromUrl(imageList[0]);
 
-        // Input oculto para cargar archivos locales
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
@@ -293,29 +334,26 @@
             }
         };
 
-        // Elementos del Modal URL
         const urlModal = document.getElementById('urlModal');
         const urlInput = document.getElementById('urlInput');
         const cancelUrlBtn = document.getElementById('cancelUrlBtn');
         const loadUrlBtn = document.getElementById('loadUrlBtn');
         let lastValidSelection = "0";
 
-        // Event Listener para cambiar imagen desde el UI
         document.getElementById('imageSelect').addEventListener('change', (e) => {
             const val = e.target.value;
             if (val === 'local') {
                 fileInput.click();
-                e.target.value = lastValidSelection; // Revertir visualmente al anterior
+                e.target.value = lastValidSelection;
             } else if (val === 'url') {
                 urlModal.classList.remove('hidden');
-                e.target.value = lastValidSelection; // Revertir visualmente al anterior
+                e.target.value = lastValidSelection;
             } else {
                 loadTextureFromUrl(imageList[parseInt(val)]);
                 lastValidSelection = val;
             }
         });
 
-        // Eventos del Modal
         cancelUrlBtn.addEventListener('click', () => {
             urlModal.classList.add('hidden');
             urlInput.value = '';
@@ -329,7 +367,6 @@
             }
         });
 
-        // Utilidad Hex a RGB
         function hexToRgb(hex) {
             let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? [
@@ -344,11 +381,13 @@
         const intensityCtrl = document.getElementById('intensity');
         const color1Ctrl = document.getElementById('color1');
         const color2Ctrl = document.getElementById('color2');
+        const fitSelect = document.getElementById('fitSelect');
+        const directionSelect = document.getElementById('directionSelect');
+        const angleCtrl = document.getElementById('angle');
+        const angleValueDisplay = document.getElementById('angleValueDisplay');
 
-        // Lógica de Ocultamiento de UI
         const uiElements = document.querySelectorAll('.ui-element');
 
-        // Ocultar/Mostrar UI al hacer clic en el canvas
         canvas.addEventListener('click', () => {
             uiElements.forEach(el => {
                 el.classList.toggle('opacity-0');
@@ -356,68 +395,55 @@
             });
         });
 
-        // Lógica Avanzada de Captura
         const captureBtn = document.getElementById('captureBtn');
         const captureResSelect = document.getElementById('captureResSelect');
 
         captureBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita que se oculte la UI al dar clic
+            e.stopPropagation(); 
             
             const resType = captureResSelect.value;
             let capW = canvas.width;
             let capH = canvas.height;
             
-            // Asignar dimensiones según la opción seleccionada
-            if (resType === 'hd720') {
-                capW = 1280; capH = 720;
-            } else if (resType === 'hd') {
-                capW = 1920; capH = 1080;
-            } else if (resType === '2k') {
-                capW = 2560; capH = 1440;
-            } else if (resType === '4k') {
-                capW = 3840; capH = 2160;
-            } else if (resType === '8k') {
-                capW = 7680; capH = 4320;
-            } else if (resType === 'square') {
-                capW = 1080; capH = 1080;
-            } else if (resType === 'vertical') {
-                capW = 1080; capH = 1920;
-            } else if (resType === 'original') {
-                capW = currentImgW; capH = currentImgH;
-            }
+            if (resType === 'hd720') { capW = 1280; capH = 720; }
+            else if (resType === 'hd') { capW = 1920; capH = 1080; }
+            else if (resType === '2k') { capW = 2560; capH = 1440; }
+            else if (resType === '4k') { capW = 3840; capH = 2160; }
+            else if (resType === '8k') { capW = 7680; capH = 4320; }
+            else if (resType === 'square') { capW = 1080; capH = 1080; }
+            else if (resType === 'vertical') { capW = 1080; capH = 1920; }
+            else if (resType === 'original') { capW = currentImgW; capH = currentImgH; }
             
-            // Guardar el estado original del canvas
             const oldW = canvas.width;
             const oldH = canvas.height;
             
-            // Forzar nuevo tamaño para la captura
             canvas.width = capW;
             canvas.height = capH;
             gl.viewport(0, 0, capW, capH);
             
-            // Renderizar un frame síncrono con la nueva resolución
             gl.useProgram(program);
             gl.uniform2f(resLoc, capW, capH);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             
-            // Capturar y descargar
             const dataURL = canvas.toDataURL("image/png");
             const link = document.createElement("a");
             link.download = `Refraction_Zeqel_${resType.toUpperCase()}.png`;
             link.href = dataURL;
             link.click();
             
-            // Restaurar el canvas al instante para que el usuario no note el cambio
             canvas.width = oldW;
             canvas.height = oldH;
             gl.viewport(0, 0, oldW, oldH);
-            // El uniform `resLoc` se actualizará automáticamente en el próximo frame normal
+        });
+
+        // Actualizar visualizador de inclinación interactivo
+        angleCtrl.addEventListener('input', (e) => {
+            angleValueDisplay.innerText = e.target.value + '°';
         });
 
         function render(time) {
             time *= 0.001;
             
-            // Multiplicador de densidad de píxeles (para pantallas de alta resolución)
             const dpr = window.devicePixelRatio || 1;
             const targetWidth = Math.floor(window.innerWidth * dpr);
             const targetHeight = Math.floor(window.innerHeight * dpr);
@@ -435,6 +461,12 @@
             gl.uniform2f(resLoc, canvas.width, canvas.height);
             gl.uniform1f(speedLoc, parseFloat(speedCtrl.value));
             gl.uniform1f(intensityLoc, parseFloat(intensityCtrl.value));
+            gl.uniform1f(fitModeLoc, parseFloat(fitSelect.value)); 
+            
+            // Lógica de Ángulo (Suma Orientación + Inclinación Manual)
+            let baseAngle = parseFloat(directionSelect.value);
+            let extraAngle = parseFloat(angleCtrl.value);
+            gl.uniform1f(angleLoc, baseAngle + extraAngle);
             
             let c1 = hexToRgb(color1Ctrl.value);
             let c2 = hexToRgb(color2Ctrl.value);
